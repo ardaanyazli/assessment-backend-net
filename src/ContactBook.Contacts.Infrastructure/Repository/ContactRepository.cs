@@ -1,3 +1,4 @@
+using ContactBook.Contacts.Application.DTOs;
 using ContactBook.Contacts.Application.Interfaces;
 using ContactBook.Contacts.Domain.Entities;
 
@@ -5,13 +6,12 @@ namespace ContactBook.Contacts.Infrastructure.Repository;
 
 public class ContactRepository : IContactRepository
 {
-
-    public Task CreateContact(Contact contact)
+    public Task<Contact> CreateContactAsync(Contact contact)
     {
         throw new NotImplementedException();
     }
 
-    public Task DeleteContact(Guid contactId)
+    public Task DeleteContactAsync(Guid id)
     {
         throw new NotImplementedException();
     }
@@ -26,7 +26,7 @@ public class ContactRepository : IContactRepository
         throw new NotImplementedException();
     }
 
-    public Task UpdateContact(Contact contact)
+    public Task<Contact> UpdateContactAsync(Contact contact)
     {
         throw new NotImplementedException();
     }

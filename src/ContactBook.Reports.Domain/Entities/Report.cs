@@ -1,6 +1,6 @@
 namespace ContactBook.Reports.Domain.Entities;
 
-class Report
+public class Report
 {
     public Guid Id { get; set; }
     public DateTime RequestedAt { get; set; }
