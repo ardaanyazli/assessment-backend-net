@@ -1,33 +1,54 @@
-using ContactBook.Contacts.Application.DTOs;
 using ContactBook.Contacts.Application.Interfaces;
 using ContactBook.Contacts.Domain.Entities;
+using ContactBook.Contacts.Infrastructure.Persistence;
 
 namespace ContactBook.Contacts.Infrastructure.Repository;
 
 public class ContactRepository : IContactRepository
 {
-    public Task<Contact> CreateContactAsync(Contact contact)
+    private readonly ContactsDbContext _context;
+
+    public ContactRepository(ContactsDbContext context)
     {
-        throw new NotImplementedException();
+        _context = context;
     }
 
-    public Task DeleteContactAsync(Guid id)
+
+    public async Task<Contact> CreateContactAsync(Contact contact)
     {
-        throw new NotImplementedException();
+        await _context.Contacts.AddAsync(contact);
+
+        await _context.SaveChangesAsync();
+
+        return contact;
     }
 
-    public Task<Contact> GetContactByIdAsync(Guid id)
+    public async Task DeleteContactAsync(Guid id)
     {
-        throw new NotImplementedException();
+        var contact = _context.Contacts.Find(id) ?? throw new NullReferenceException($"Contact with {id} not found.");
+
+        _context.Contacts.Remove(contact);
+
+        await _context.SaveChangesAsync();
     }
 
-    public Task<IEnumerable<Contact>> GetContactsAsync()
+    public async Task<Contact> GetContactByIdAsync(Guid id)
     {
-        throw new NotImplementedException();
+        var contact = _context.Contacts.Find(id) ?? throw new NullReferenceException($"Contact with {id} not found.");
+
+        return contact;
     }
 
-    public Task<Contact> UpdateContactAsync(Contact contact)
+    public async Task<IList<Contact>> GetContactsAsync()
     {
-        throw new NotImplementedException();
+        return _context.Contacts.ToList();
+    }
+
+    public async Task<Contact> UpdateContactAsync(Contact contact)
+    {
+        _context.Contacts.Update(contact);
+
+        await _context.SaveChangesAsync();
+        return contact;
     }
 }

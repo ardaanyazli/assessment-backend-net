@@ -4,8 +4,8 @@ namespace ContactBook.Reports.Application.Interfaces;
 
 public interface IReportRepository
 {
-    Task<IEnumerable<Report>> GetReportsAsync();
+    Task<IList<Report>> GetReportsAsync();
     Task<Report> GetReportAsync(Guid id);
-    Task<Report> UpdateReport(Report report);
-    Task DeleteReport(Guid reportId);
+    Task<Report> UpdateReportAsync(Report report);
+    Task DeleteReportAsync(Guid reportId);
 }
