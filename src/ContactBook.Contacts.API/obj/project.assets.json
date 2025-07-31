@@ -33,6 +33,29 @@
             "related": ".pdb;.xml"
           }
         }
+      },
+      "ContactBook.Contacts.Application/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v9.0",
+        "dependencies": {
+          "ContactBook.Contacts.Domain": "1.0.0"
+        },
+        "compile": {
+          "bin/placeholder/ContactBook.Contacts.Application.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/ContactBook.Contacts.Application.dll": {}
+        }
+      },
+      "ContactBook.Contacts.Domain/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v9.0",
+        "compile": {
+          "bin/placeholder/ContactBook.Contacts.Domain.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/ContactBook.Contacts.Domain.dll": {}
+        }
       }
     }
   },
@@ -67,10 +90,21 @@
         "microsoft.openapi.1.6.17.nupkg.sha512",
         "microsoft.openapi.nuspec"
       ]
+    },
+    "ContactBook.Contacts.Application/1.0.0": {
+      "type": "project",
+      "path": "../ContactBook.Contacts.Application/ContactBook.Contacts.Application.csproj",
+      "msbuildProject": "../ContactBook.Contacts.Application/ContactBook.Contacts.Application.csproj"
+    },
+    "ContactBook.Contacts.Domain/1.0.0": {
+      "type": "project",
+      "path": "../ContactBook.Contacts.Domain/ContactBook.Contacts.Domain.csproj",
+      "msbuildProject": "../ContactBook.Contacts.Domain/ContactBook.Contacts.Domain.csproj"
     }
   },
   "projectFileDependencyGroups": {
     "net9.0": [
+      "ContactBook.Contacts.Application >= 1.0.0",
       "Microsoft.AspNetCore.OpenApi >= 9.0.7"
     ]
   },
@@ -98,7 +132,11 @@
       "frameworks": {
         "net9.0": {
           "targetAlias": "net9.0",
-          "projectReferences": {}
+          "projectReferences": {
+            "/Users/ardaanyazli/assessment-backend-net/src/ContactBook.Contacts.Application/ContactBook.Contacts.Application.csproj": {
+              "projectPath": "/Users/ardaanyazli/assessment-backend-net/src/ContactBook.Contacts.Application/ContactBook.Contacts.Application.csproj"
+            }
+          }
         }
       },
       "warningProperties": {
