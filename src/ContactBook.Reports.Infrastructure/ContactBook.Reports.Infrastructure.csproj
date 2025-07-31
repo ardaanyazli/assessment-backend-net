@@ -1,5 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
+  <ItemGroup>
+    <ProjectReference Include="..\ContactBook.Reports.Application\ContactBook.Reports.Application.csproj" />
+    <ProjectReference Include="..\ContactBook.Reports.Domain\ContactBook.Reports.Domain.csproj" />
+  </ItemGroup>
+
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
