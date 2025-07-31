@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "5ENFWd4Hdyk=",
+  "success": true,
+  "projectFilePath": "/Users/ardaanyazli/assessment-backend-net/src/ContactBook.Reports.API/ContactBook.Reports.API.csproj",
+  "expectedPackageFiles": [
+    "/Users/ardaanyazli/.nuget/packages/microsoft.aspnetcore.openapi/9.0.7/microsoft.aspnetcore.openapi.9.0.7.nupkg.sha512",
+    "/Users/ardaanyazli/.nuget/packages/microsoft.openapi/1.6.17/microsoft.openapi.1.6.17.nupkg.sha512"
+  ],
+  "logs": []
+}
