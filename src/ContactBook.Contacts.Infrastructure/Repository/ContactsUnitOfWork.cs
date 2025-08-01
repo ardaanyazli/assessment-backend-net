@@ -1,4 +1,3 @@
-using System;
 using ContactBook.Contacts.Application.Interfaces;
 using ContactBook.Contacts.Infrastructure.Persistence;
 
@@ -20,9 +19,9 @@ public class ContactsUnitOfWork : IContactsUnitOfWork
 
     public IContactInfoRepository ContactInfoRepository { get; }
 
-    public Task<int> SaveChangesAsync()
+    public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
         _context.ChangeTracker.DetectChanges();
-        return _context.SaveChangesAsync();
+        return _context.SaveChangesAsync(cancellationToken);
     }
 }

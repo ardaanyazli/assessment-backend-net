@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using ContactBook.Reports.Domain.Entities;
+﻿using ContactBook.Reports.Domain.Entities;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable

@@ -1,3 +1,4 @@
+using ContactBook.Reports.API.Middleware;
 using ContactBook.Reports.Application.Interfaces;
 using ContactBook.Reports.Infrastructure.Persistence;
 using ContactBook.Reports.Infrastructure.Repository;
@@ -18,8 +19,26 @@ builder.Services.AddDbContext<ReportDbContext>(options =>{
 
 var app = builder.Build();
 // Configure the HTTP request pipeline.
+app.Use(async (context, next) =>
+{
+    var cancellationToken = context.RequestAborted;
 
+    try
+    {
+        // Simulate artificial latency (e.g., 2 seconds)
+        await Task.Delay(TimeSpan.FromSeconds(2), cancellationToken);
+    }
+    catch (OperationCanceledException)
+    {
+        // If request was cancelled during the delay, let RequestCancellationMiddleware handle it
+        return;
+    }
 
+    await next(); // Continue to next middleware
+});
+
+app.UseMiddleware<ErrorHandlingMiddleware>();
+app.UseMiddleware<RequestCancellationMiddleware>();
 app.UseHttpsRedirection();
 app.MapHealthChecks("/health");
 app.MapControllers();

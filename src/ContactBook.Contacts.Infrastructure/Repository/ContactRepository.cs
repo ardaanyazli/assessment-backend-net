@@ -15,43 +15,32 @@ public class ContactRepository : IContactRepository
     }
 
 
-    public async Task<Contact> CreateContactAsync(Contact contact)
+    public async Task CreateContactAsync(Contact contact,CancellationToken cancellationToken = default)
     {
-        await _context.Contacts.AddAsync(contact);
-
-        await _context.SaveChangesAsync();
-
-        return contact;
+        await _context.Contacts.AddAsync(contact, cancellationToken);
     }
 
-    public async Task DeleteContactAsync(Guid id)
+    public async Task DeleteContactAsync(Guid id,CancellationToken cancellationToken = default)
     {
-        var contact = await _context.Contacts.FindAsync(id) ?? throw new NullReferenceException($"Contact with {id} not found.");
+        var contact = await _context.Contacts.FindAsync(id,cancellationToken) ?? throw new NullReferenceException($"Contact with {id} not found.");
 
         _context.Contacts.Remove(contact);
-
-        await _context.SaveChangesAsync();
     }
 
-    public async Task<Contact> GetContactByIdAsync(Guid id)
+    public async Task<Contact> GetContactByIdAsync(Guid id,CancellationToken cancellationToken = default)
     {
-        var contact = await _context.Contacts.FindAsync(id) ?? throw new NullReferenceException($"Contact with {id} not found.");
+        var contact = await _context.Contacts.FindAsync(id,cancellationToken) ?? throw new NullReferenceException($"Contact with {id} not found.");
 
         return contact;
     }
 
-    public async Task<IList<Contact>> GetContactsAsync()
+    public async Task<IList<Contact>> GetContactsAsync(CancellationToken cancellationToken = default)
     {
-        return await _context.Contacts.ToListAsync();
+        return await _context.Contacts.ToListAsync(cancellationToken);
     }
 
     public void UpdateContact(Contact contact)
     {
         _context.Contacts.Update(contact);
-    }
-
-    Task IContactRepository.CreateContactAsync(Contact contact)
-    {
-        return CreateContactAsync(contact);
     }
 }

@@ -1,10 +1,12 @@
 {
   "version": 2,
-  "dgSpecHash": "UOPBf5X11Uc=",
+  "dgSpecHash": "J7/D8xdCm2w=",
   "success": true,
   "projectFilePath": "/Users/ardaanyazli/assessment-backend-net/src/ContactBook.Reports.API/ContactBook.Reports.API.csproj",
   "expectedPackageFiles": [
+    "/Users/ardaanyazli/.nuget/packages/confluent.kafka/2.11.0/confluent.kafka.2.11.0.nupkg.sha512",
     "/Users/ardaanyazli/.nuget/packages/humanizer.core/2.14.1/humanizer.core.2.14.1.nupkg.sha512",
+    "/Users/ardaanyazli/.nuget/packages/librdkafka.redist/2.11.0/librdkafka.redist.2.11.0.nupkg.sha512",
     "/Users/ardaanyazli/.nuget/packages/microsoft.aspnetcore.openapi/9.0.7/microsoft.aspnetcore.openapi.9.0.7.nupkg.sha512",
     "/Users/ardaanyazli/.nuget/packages/microsoft.bcl.asyncinterfaces/7.0.0/microsoft.bcl.asyncinterfaces.7.0.0.nupkg.sha512",
     "/Users/ardaanyazli/.nuget/packages/microsoft.build.framework/17.8.3/microsoft.build.framework.17.8.3.nupkg.sha512",

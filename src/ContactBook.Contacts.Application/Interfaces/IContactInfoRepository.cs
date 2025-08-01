@@ -1,13 +1,12 @@
-using ContactBook.Contacts.Application.DTOs;
 using ContactBook.Contacts.Domain.Entities;
 
 namespace  ContactBook.Contacts.Application.Interfaces;
 public interface IContactInfoRepository
 {
-    Task<IList<ContactInfo>> GetContactInfosAsync();
-    Task<ContactInfo> GetContactInfoAsync(Guid id);
-    Task<IList<ContactInfo>> GetContactInfoByContactIdAsync(Guid contactId);
-    Task AddContactInfoAsync(ContactInfo contactInfo);
+    Task<IList<ContactInfo>> GetContactInfosAsync(CancellationToken cancellationToken = default);
+    Task<ContactInfo> GetContactInfoAsync(Guid id,CancellationToken cancellationToken = default);
+    Task<IList<ContactInfo>> GetContactInfoByContactIdAsync(Guid contactId,CancellationToken cancellationToken = default);
+    Task AddContactInfoAsync(ContactInfo contactInfo,CancellationToken cancellationToken = default);
     void UpdateContactInfo(ContactInfo contactInfo);
-    Task DeleteContactInfoAsync(Guid id);
+    Task DeleteContactInfoAsync(Guid id,CancellationToken cancellationToken = default);
 }

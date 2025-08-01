@@ -1,5 +1,3 @@
-using System;
-
 namespace ContactBook.Contacts.Application.Interfaces;
 
 public interface IContactsUnitOfWork
@@ -7,6 +5,6 @@ public interface IContactsUnitOfWork
     IContactRepository ContactRepository { get; }
     IContactInfoRepository ContactInfoRepository { get; }
 
-    Task<int> SaveChangesAsync();
+    Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 
 }

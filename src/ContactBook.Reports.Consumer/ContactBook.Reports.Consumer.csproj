@@ -8,6 +8,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Confluent.Kafka" Version="2.11.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.7" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.7" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ContactBook.Contacts.Infrastructure\ContactBook.Contacts.Infrastructure.csproj" />
+    <ProjectReference Include="..\ContactBook.Reports.Infrastructure\ContactBook.Reports.Infrastructure.csproj" />
   </ItemGroup>
 </Project>

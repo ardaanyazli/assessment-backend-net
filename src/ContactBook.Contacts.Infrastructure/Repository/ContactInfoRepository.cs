@@ -14,36 +14,36 @@ public class ContactInfoRepository : IContactInfoRepository
         _context = context;
     }
 
-    public async Task AddContactInfoAsync(ContactInfo contactInfo)
+    public async Task AddContactInfoAsync(ContactInfo contactInfo,CancellationToken cancellationToken = default)
     {
-        await _context.ContactInfos.AddAsync(contactInfo);
+        await _context.ContactInfos.AddAsync(contactInfo,cancellationToken);
     }
 
-    public async Task DeleteContactInfoAsync(Guid id)
+    public async Task DeleteContactInfoAsync(Guid id,CancellationToken cancellationToken = default)
     {
-        var contactInfo = await _context.ContactInfos.FindAsync(id) ?? throw new KeyNotFoundException($"ContactInfo with ID {id} not found.");
+        var contactInfo = await _context.ContactInfos.FindAsync(id,cancellationToken) ?? throw new KeyNotFoundException($"ContactInfo with ID {id} not found.");
 
         _context.ContactInfos.Remove(contactInfo);
     }
 
-    public async Task<ContactInfo> GetContactInfoAsync(Guid id)
+    public async Task<ContactInfo> GetContactInfoAsync(Guid id,CancellationToken cancellationToken = default)
     {
         return await _context.ContactInfos
-            .FindAsync(id)
+            .FindAsync(id,cancellationToken)
             ?? throw new KeyNotFoundException($"ContactInfo with ID {id} not found.");
     }
 
-    public async Task<IList<ContactInfo>> GetContactInfoByContactIdAsync(Guid contactId)
+    public async Task<IList<ContactInfo>> GetContactInfoByContactIdAsync(Guid contactId,CancellationToken cancellationToken = default)
     {
         return await _context.ContactInfos
             .Where(ci => ci.ContactId == contactId)
-            .ToListAsync() ?? throw new KeyNotFoundException($"No ContactInfo found for Contact ID {contactId}.");
+            .ToListAsync(cancellationToken) ?? throw new KeyNotFoundException($"No ContactInfo found for Contact ID {contactId}.");
     }
 
-    public async Task<IList<ContactInfo>> GetContactInfosAsync()
+    public async Task<IList<ContactInfo>> GetContactInfosAsync(CancellationToken cancellationToken = default)
     {
         return await _context.ContactInfos
-             .ToListAsync();
+             .ToListAsync(cancellationToken);
     }
 
     public void UpdateContactInfo(ContactInfo contactInfo)

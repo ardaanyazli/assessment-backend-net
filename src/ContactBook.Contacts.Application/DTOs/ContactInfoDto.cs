@@ -1,3 +1,3 @@
 namespace ContactBook.Contacts.Application.DTOs;
 
-public record ContactInfoDto(string Type, string Value, bool IsDefault);
+public record ContactInfoDto(Guid Id,string Type, string Value, bool IsDefault);
