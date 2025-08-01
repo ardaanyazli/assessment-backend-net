@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "Y+avWMmdiSk=",
+  "dgSpecHash": "UOPBf5X11Uc=",
   "success": true,
   "projectFilePath": "/Users/ardaanyazli/assessment-backend-net/src/ContactBook.Reports.API/ContactBook.Reports.API.csproj",
   "expectedPackageFiles": [
@@ -34,6 +34,7 @@
     "/Users/ardaanyazli/.nuget/packages/mono.texttemplating/3.0.0/mono.texttemplating.3.0.0.nupkg.sha512",
     "/Users/ardaanyazli/.nuget/packages/npgsql/9.0.3/npgsql.9.0.3.nupkg.sha512",
     "/Users/ardaanyazli/.nuget/packages/npgsql.entityframeworkcore.postgresql/9.0.4/npgsql.entityframeworkcore.postgresql.9.0.4.nupkg.sha512",
+    "/Users/ardaanyazli/.nuget/packages/swashbuckle.aspnetcore.swaggerui/9.0.3/swashbuckle.aspnetcore.swaggerui.9.0.3.nupkg.sha512",
     "/Users/ardaanyazli/.nuget/packages/system.codedom/6.0.0/system.codedom.6.0.0.nupkg.sha512",
     "/Users/ardaanyazli/.nuget/packages/system.collections.immutable/7.0.0/system.collections.immutable.7.0.0.nupkg.sha512",
     "/Users/ardaanyazli/.nuget/packages/system.composition/7.0.0/system.composition.7.0.0.nupkg.sha512",

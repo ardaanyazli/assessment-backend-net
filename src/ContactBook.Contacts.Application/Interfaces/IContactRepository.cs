@@ -6,7 +6,7 @@ public interface IContactRepository
 {
     Task<IList<Contact>> GetContactsAsync();
     Task<Contact> GetContactByIdAsync(Guid id);
-    Task<Contact> CreateContactAsync(Contact contact);
-    Task<Contact> UpdateContactAsync(Contact contact);
+    Task CreateContactAsync(Contact contact);
+    void UpdateContact(Contact contact);
     Task DeleteContactAsync(Guid id);
 }

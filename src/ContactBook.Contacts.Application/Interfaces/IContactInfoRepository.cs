@@ -7,7 +7,7 @@ public interface IContactInfoRepository
     Task<IList<ContactInfo>> GetContactInfosAsync();
     Task<ContactInfo> GetContactInfoAsync(Guid id);
     Task<IList<ContactInfo>> GetContactInfoByContactIdAsync(Guid contactId);
-    Task<ContactInfo> AddContactInfoAsync(ContactInfo contactInfo);
-    Task<ContactInfo> UpdateContactInfoAsync(ContactInfo contactInfo);
+    Task AddContactInfoAsync(ContactInfo contactInfo);
+    void UpdateContactInfo(ContactInfo contactInfo);
     Task DeleteContactInfoAsync(Guid id);
 }

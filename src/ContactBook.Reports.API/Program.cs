@@ -18,20 +18,24 @@ builder.Services.AddDbContext<ReportDbContext>(options =>{
 
 var app = builder.Build();
 // Configure the HTTP request pipeline.
+
+
+app.UseHttpsRedirection();
+app.MapHealthChecks("/health");
+app.MapControllers();
+
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    app.UseSwaggerUI(options =>
+    {
+        options.SwaggerEndpoint("/openapi/v1.json", "ContactBook Reports API V1");
+    });
     using (var scope = app.Services.CreateScope())
-        {
-            var db = scope.ServiceProvider.GetRequiredService<ReportDbContext>();
-            db.Database.Migrate(); // Ensures DB and schema exist
-        }
-
+    {
+        var db = scope.ServiceProvider.GetRequiredService<ReportDbContext>();
+        db.Database.Migrate(); // Ensures DB and schema exist
+    }
 }
-
-app.UseHttpsRedirection();
-
-app.MapControllers();
-app.UseHealthChecks("/health");
 app.Run();
 

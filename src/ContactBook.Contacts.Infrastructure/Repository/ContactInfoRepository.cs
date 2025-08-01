@@ -1,4 +1,3 @@
-using ContactBook.Contacts.Application.DTOs;
 using ContactBook.Contacts.Application.Interfaces;
 using ContactBook.Contacts.Domain.Entities;
 using ContactBook.Contacts.Infrastructure.Persistence;
@@ -15,10 +14,9 @@ public class ContactInfoRepository : IContactInfoRepository
         _context = context;
     }
 
-    public Task<ContactInfo> AddContactInfoAsync(ContactInfo contactInfo)
+    public async Task AddContactInfoAsync(ContactInfo contactInfo)
     {
-        _context.ContactInfos.Add(contactInfo);
-        return _context.SaveChangesAsync().ContinueWith(t => contactInfo);
+        await _context.ContactInfos.AddAsync(contactInfo);
     }
 
     public async Task DeleteContactInfoAsync(Guid id)
@@ -26,7 +24,6 @@ public class ContactInfoRepository : IContactInfoRepository
         var contactInfo = await _context.ContactInfos.FindAsync(id) ?? throw new KeyNotFoundException($"ContactInfo with ID {id} not found.");
 
         _context.ContactInfos.Remove(contactInfo);
-        await _context.SaveChangesAsync();
     }
 
     public async Task<ContactInfo> GetContactInfoAsync(Guid id)
@@ -49,12 +46,8 @@ public class ContactInfoRepository : IContactInfoRepository
              .ToListAsync();
     }
 
-    public async Task<ContactInfo> UpdateContactInfoAsync(ContactInfo contactInfo)
+    public void UpdateContactInfo(ContactInfo contactInfo)
     {
         _context.ContactInfos.Update(contactInfo);
-        return await _context.SaveChangesAsync().ContinueWith(t => contactInfo);
     }
-
-
-
 }

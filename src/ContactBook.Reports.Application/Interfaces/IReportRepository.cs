@@ -8,4 +8,5 @@ public interface IReportRepository
     Task<Report> GetReportAsync(Guid id);
     Task<Report> UpdateReportAsync(Report report);
     Task DeleteReportAsync(Guid reportId);
+    Task<Report> CreateReportAsync(Report report);
 }

@@ -45,11 +45,13 @@ public class ContactRepository : IContactRepository
         return await _context.Contacts.ToListAsync();
     }
 
-    public async Task<Contact> UpdateContactAsync(Contact contact)
+    public void UpdateContact(Contact contact)
     {
         _context.Contacts.Update(contact);
+    }
 
-        await _context.SaveChangesAsync();
-        return contact;
+    Task IContactRepository.CreateContactAsync(Contact contact)
+    {
+        return CreateContactAsync(contact);
     }
 }

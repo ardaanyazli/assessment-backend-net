@@ -42,4 +42,12 @@ public class ReportRepository : IReportRepository
         return report;
     }
 
+    public async Task<Report> CreateReportAsync(Report report)
+    {
+        _context.Reports.Add(report);
+        await _context.SaveChangesAsync();
+
+        return report;
+    }
+
 }
