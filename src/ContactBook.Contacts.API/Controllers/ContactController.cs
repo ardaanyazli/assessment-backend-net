@@ -2,6 +2,7 @@ using ContactBook.Contacts.Application.Interfaces;
 using ContactBook.Contacts.Application.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using ContactBook.Contects.Application.DTOs;
+using ContactBook.Contacts.Domain.Entities;
 
 namespace ContactBook.Contacts.API.Controllers;
 
@@ -28,11 +29,10 @@ public class ContactsController : ControllerBase
         try
         {
             var contactList = await _contactRepository.GetContactsAsync();
-            var contactsResult = contactList.Select(c => new ContactListDto()
-            {
-                Id = c.Id,
-                FullName = $"{c.FirstName} {c.LastName}"
-            });
+            var contactsResult = contactList.Select(c => new ContactListDto(
+                c.Id,
+                $"{c.FirstName} {c.LastName}"
+            ));
 
             return Results.Ok(contactsResult);
         }
@@ -54,18 +54,13 @@ public class ContactsController : ControllerBase
             {
                 return Results.NotFound($"Contact with ID {id} not found.");
             }
-            return Results.Ok(new ContactDto
-            {
-                Id = contact.Id,
-                FullName = $"{contact.FirstName} {contact.LastName}",
-                ContactInfo = contact.ContactInfos.Select(ci => new ContactInfoDto
-                ()
-                {
-                    Type = ci.InfoType.ToString(),
-                    Value = ci.Value,
-                    IsDefault = ci.IsDefault
-                }).ToList()
-            });
+            var contactInfoList = await _contactInfoRepository.GetContactInfoByContactIdAsync(id);
+            var contactDto = new ContactDto(contact.Id,
+                $"{contact.FirstName} {contact.LastName}",
+                contactInfoList.Select(ci => new ContactInfoDto(Enum.GetName(ci.InfoType)!, ci.Value, ci.IsDefault)).ToList()
+            );
+
+            return Results.Ok(contactDto);
         }
         catch (Exception ex)
         {
@@ -75,11 +70,19 @@ public class ContactsController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IResult> CreateContact( CreateContactDto createContactDto, CancellationToken cancellationToken)
+    public async Task<IResult> CreateContact(CreateContactDto createContactDto, CancellationToken cancellationToken)
     {
         try
         {
-            var contact = await _contactRepository.CreateContactAsync(createContactDto);
+
+            var contact = new Contact()
+            {
+                Id = Guid.NewGuid(),
+                FirstName = createContactDto.FirstName,
+                LastName = createContactDto.LastName
+            };
+
+            await _contactRepository.CreateContactAsync(contact);
 
             return Results.Created();
         }
@@ -102,7 +105,10 @@ public class ContactsController : ControllerBase
                 return Results.NotFound($"Contact with ID {id} not found.");
             }
 
-            var updatedContact = await _contactRepository.UpdateContactAsync(id, updateContactDto);
+            existingContact.FirstName = updateContactDto.FirstName;
+            existingContact.LastName = updateContactDto.LastName;
+
+            var updatedContact = await _contactRepository.UpdateContactAsync(existingContact);
 
             return Results.Ok();
         }
@@ -135,7 +141,7 @@ public class ContactsController : ControllerBase
     }
 
     [HttpPost("{id}/info")]
-    public async Task<IResult> AddContactInfo(Guid id, [FromBody] CreateContactInfoDto createContactInfoDto, CancellationToken cancellationToken)
+    public async Task<IResult> AddContactInfo(Guid id, CreateContactInfoDto createContactInfoDto, CancellationToken cancellationToken)
     {
         try
         {
@@ -146,7 +152,14 @@ public class ContactsController : ControllerBase
                 return Results.NotFound($"Contact with ID {id} not found.");
             }
 
-            var updatedContact = await _contactInfoRepository.AddContactInfoAsync(id, createContactInfoDto);
+            var updatedContact = await _contactInfoRepository.AddContactInfoAsync(new ContactInfo
+            {
+                Id = Guid.NewGuid(),
+                InfoType = createContactInfoDto.ContactInfoType,
+                Value = createContactInfoDto.Value,
+                IsDefault = createContactInfoDto.IsDefault,
+                ContactId = id
+            });
 
             return Results.NoContent();
         }
@@ -159,7 +172,7 @@ public class ContactsController : ControllerBase
     }
 
     [HttpPut("{id}/info/{infoId}")]
-    public async Task<IResult> UpdateContactInfo(Guid id, Guid infoId, ContactInfoDto updateContactInfoDto, CancellationToken cancellationToken)
+    public async Task<IResult> UpdateContactInfo(Guid id, ContactInfoDto updateContactInfoDto, CancellationToken cancellationToken)
     {
         try
         {
@@ -168,13 +181,13 @@ public class ContactsController : ControllerBase
             {
                 return Results.NotFound($"Contact not found.");
             }
+            //TODO: Fix update implementation
+            // if (!_contactInfoRepository.GetContactInfoAsync(ci => ci.Id == infoId))
+            // {
+            //     return Results.NotFound($"Contact information not found.");
+            // }
 
-            if (!contact.ContactInfos.Any(ci => ci.Id == infoId))
-            {
-                return Results.NotFound($"Contact information not found.");
-            }
-
-            var updatedContact = await _contactInfoRepository.UpdateContactInfoAsync(id, infoId, updateContactInfoDto);
+            // var updatedContact = await _contactInfoRepository.UpdateContactInfoAsync(id,);
             return Results.Ok();
         }
         catch (Exception ex)
@@ -184,7 +197,7 @@ public class ContactsController : ControllerBase
         }
     }
 
-[HttpDelete("{id}/info/{infoId}")]
+    [HttpDelete("{id}/info/{infoId}")]
     public async Task<IResult> DeleteContactInfo(Guid id, Guid infoId, CancellationToken cancellationToken)
     {
         try
@@ -195,7 +208,7 @@ public class ContactsController : ControllerBase
                 return Results.NotFound($"Contact with ID {id} not found.");
             }
 
-            await _contactInfoRepository.DeleteContactInfoAsync(id, infoId);
+            await _contactInfoRepository.DeleteContactInfoAsync(infoId);
             return Results.NoContent();
         }
         catch (Exception ex)

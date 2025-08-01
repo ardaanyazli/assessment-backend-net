@@ -1,6 +1,7 @@
 using ContactBook.Contacts.Application.Interfaces;
 using ContactBook.Contacts.Domain.Entities;
 using ContactBook.Contacts.Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
 
 namespace ContactBook.Contacts.Infrastructure.Repository;
 
@@ -25,7 +26,7 @@ public class ContactRepository : IContactRepository
 
     public async Task DeleteContactAsync(Guid id)
     {
-        var contact = _context.Contacts.Find(id) ?? throw new NullReferenceException($"Contact with {id} not found.");
+        var contact = await _context.Contacts.FindAsync(id) ?? throw new NullReferenceException($"Contact with {id} not found.");
 
         _context.Contacts.Remove(contact);
 
@@ -34,14 +35,14 @@ public class ContactRepository : IContactRepository
 
     public async Task<Contact> GetContactByIdAsync(Guid id)
     {
-        var contact = _context.Contacts.Find(id) ?? throw new NullReferenceException($"Contact with {id} not found.");
+        var contact = await _context.Contacts.FindAsync(id) ?? throw new NullReferenceException($"Contact with {id} not found.");
 
         return contact;
     }
 
     public async Task<IList<Contact>> GetContactsAsync()
     {
-        return _context.Contacts.ToList();
+        return await _context.Contacts.ToListAsync();
     }
 
     public async Task<Contact> UpdateContactAsync(Contact contact)

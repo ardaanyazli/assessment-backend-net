@@ -4,9 +4,10 @@ using ContactBook.Contacts.Domain.Entities;
 namespace  ContactBook.Contacts.Application.Interfaces;
 public interface IContactInfoRepository
 {
-    Task<IEnumerable<ContactInfo>> GetContactInfosAsync(Guid contactId);
-    Task<ContactInfo> GetContactInfoByTypeAsync(Guid contactId, Guid infoId);
-    Task<ContactInfo> AddContactInfoAsync(Guid contactId, CreateContactInfoDto contactInfoDto);
-    Task<ContactInfo> UpdateContactInfoAsync(Guid contactId, Guid infoId, ContactInfoDto contactInfoDto);
-    Task DeleteContactInfoAsync(Guid contactId, Guid infoId);
+    Task<IList<ContactInfo>> GetContactInfosAsync();
+    Task<ContactInfo> GetContactInfoAsync(Guid id);
+    Task<IList<ContactInfo>> GetContactInfoByContactIdAsync(Guid contactId);
+    Task<ContactInfo> AddContactInfoAsync(ContactInfo contactInfo);
+    Task<ContactInfo> UpdateContactInfoAsync(ContactInfo contactInfo);
+    Task DeleteContactInfoAsync(Guid id);
 }

@@ -5,6 +5,11 @@ namespace ContactBook.Contacts.Infrastructure.Persistence;
 
 public class ContactsDbContext : DbContext
 {
+    public ContactsDbContext(DbContextOptions<ContactsDbContext> options)
+        : base(options)
+    {
+        
+    }
     public DbSet<Contact> Contacts => Set<Contact>();
     public DbSet<ContactInfo> ContactInfos => Set<ContactInfo>();
     protected override void OnModelCreating(ModelBuilder modelBuilder)
