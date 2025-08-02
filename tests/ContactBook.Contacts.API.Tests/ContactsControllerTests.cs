@@ -23,10 +23,10 @@ public class ContactsControllerTests
         _mockLogger = new Mock<ILogger<ContactsController>>();
         _mockContactRepository = new Mock<IContactRepository>();
         _mockContactInfoRepository = new Mock<IContactInfoRepository>();
-        
+
         _mockUnitOfWork.Setup(x => x.ContactRepository).Returns(_mockContactRepository.Object);
         _mockUnitOfWork.Setup(x => x.ContactInfoRepository).Returns(_mockContactInfoRepository.Object);
-        
+
         _controller = new ContactsController(_mockUnitOfWork.Object, _mockLogger.Object);
     }
 
@@ -39,7 +39,7 @@ public class ContactsControllerTests
             new() { Id = Guid.NewGuid(), FirstName = "John", LastName = "Doe" },
             new() { Id = Guid.NewGuid(), FirstName = "Jane", LastName = "Smith" }
         };
-        
+
         _mockContactRepository.Setup(x => x.GetContactsAsync(It.IsAny<CancellationToken>()))
             .ReturnsAsync(contacts);
 
@@ -215,7 +215,7 @@ public class ContactsControllerTests
 
         // Assert
         result.Should().BeOfType<Microsoft.AspNetCore.Http.HttpResults.NoContent>();
-        _mockContactRepository.Verify(x => x.DeleteContactAsync(contactId,CancellationToken.None), Times.Once);
+        _mockContactRepository.Verify(x => x.DeleteContactAsync(contactId, CancellationToken.None), Times.Once);
         _mockUnitOfWork.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
     }
 
@@ -263,13 +263,13 @@ public class ContactsControllerTests
         var contactId = Guid.NewGuid();
         var contactInfoId = Guid.NewGuid();
         var contact = new Contact { Id = contactId, FirstName = "John", LastName = "Doe" };
-        var contactInfo = new ContactInfo 
-        { 
-            Id = contactInfoId, 
-            ContactId = contactId, 
-            InfoType = ContactInfoType.Email, 
-            Value = "old@example.com", 
-            IsDefault = false 
+        var contactInfo = new ContactInfo
+        {
+            Id = contactInfoId,
+            ContactId = contactId,
+            InfoType = ContactInfoType.Email,
+            Value = "old@example.com",
+            IsDefault = false
         };
         var updateContactInfoDto = new ContactInfoDto(contactInfoId, "Email", "new@example.com", true);
 
@@ -306,5 +306,176 @@ public class ContactsControllerTests
         result.Should().BeOfType<Microsoft.AspNetCore.Http.HttpResults.NoContent>();
         _mockContactInfoRepository.Verify(x => x.DeleteContactInfoAsync(infoId, It.IsAny<CancellationToken>()), Times.Once);
         _mockUnitOfWork.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task GetContactInfo_ReturnsOkResult_WhenContactExists()
+    {
+        // Arrange
+        var contactId = Guid.NewGuid();
+        var contact = new Contact { Id = contactId, FirstName = "John", LastName = "Doe" };
+        var contactInfos = new List<ContactInfo>
+    {
+        new() { Id = Guid.NewGuid(), InfoType = ContactInfoType.Email, Value = "john@example.com", IsDefault = true }
+    };
+
+        _mockContactRepository.Setup(x => x.GetContactByIdAsync(contactId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(contact);
+        _mockContactInfoRepository.Setup(x => x.GetContactInfoByContactIdAsync(contactId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(contactInfos);
+
+        // Act
+        var result = await _controller.GetContactInfo(contactId, CancellationToken.None);
+
+        // Assert
+        result.Should().BeOfType<Microsoft.AspNetCore.Http.HttpResults.Ok<List<ContactInfoDto>>>();
+    }
+
+    [Fact]
+    public async Task GetContactInfo_ReturnsNotFound_WhenContactDoesNotExist()
+    {
+        // Arrange
+        var contactId = Guid.NewGuid();
+        _mockContactRepository.Setup(x => x.GetContactByIdAsync(contactId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync((Contact?)null);
+
+        // Act
+        var result = await _controller.GetContactInfo(contactId, CancellationToken.None);
+
+        // Assert
+        result.Should().BeOfType<Microsoft.AspNetCore.Http.HttpResults.NotFound<string>>();
+    }
+
+    [Fact]
+    public async Task AddContactInfo_ReturnsNotFound_WhenContactDoesNotExist()
+    {
+        // Arrange
+        var contactId = Guid.NewGuid();
+        var createContactInfoDto = new CreateContactInfoDto(ContactInfoType.Phone, "123-456-7890", false);
+
+        _mockContactRepository.Setup(x => x.GetContactByIdAsync(contactId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync((Contact?)null);
+
+        // Act
+        var result = await _controller.AddContactInfo(contactId, createContactInfoDto, CancellationToken.None);
+
+        // Assert
+        result.Should().BeOfType<Microsoft.AspNetCore.Http.HttpResults.NotFound<string>>();
+    }
+
+    [Fact]
+    public async Task UpdateContactInfo_ReturnsNotFound_WhenContactDoesNotExist()
+    {
+        // Arrange
+        var contactId = Guid.NewGuid();
+        var updateContactInfoDto = new ContactInfoDto(Guid.NewGuid(), "Email", "test@example.com", true);
+
+        _mockContactRepository.Setup(x => x.GetContactByIdAsync(contactId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync((Contact?)null);
+
+        // Act
+        var result = await _controller.UpdateContactInfo(contactId, updateContactInfoDto, CancellationToken.None);
+
+        // Assert
+        result.Should().BeOfType<Microsoft.AspNetCore.Http.HttpResults.NotFound<string>>();
+    }
+
+    [Fact]
+    public async Task UpdateContactInfo_ReturnsNotFound_WhenContactInfoDoesNotExist()
+    {
+        // Arrange
+        var contactId = Guid.NewGuid();
+        var contactInfoId = Guid.NewGuid();
+        var contact = new Contact { Id = contactId, FirstName = "John", LastName = "Doe" };
+        var updateContactInfoDto = new ContactInfoDto(contactInfoId, "Email", "test@example.com", true);
+
+        _mockContactRepository.Setup(x => x.GetContactByIdAsync(contactId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(contact);
+        _mockContactInfoRepository.Setup(x => x.GetContactInfoAsync(contactInfoId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync((ContactInfo?)null);
+
+        // Act
+        var result = await _controller.UpdateContactInfo(contactId, updateContactInfoDto, CancellationToken.None);
+
+        // Assert
+        result.Should().BeOfType<Microsoft.AspNetCore.Http.HttpResults.NotFound<string>>();
+    }
+
+    [Theory]
+    [InlineData("Phone")]
+    [InlineData("Location")]
+    public async Task UpdateContactInfo_UpdatesDifferentInfoTypes(string infoType)
+    {
+        // Arrange
+        var contactId = Guid.NewGuid();
+        var contactInfoId = Guid.NewGuid();
+        var contact = new Contact { Id = contactId, FirstName = "John", LastName = "Doe" };
+        var contactInfo = new ContactInfo
+        {
+            Id = contactInfoId,
+            ContactId = contactId,
+            InfoType = ContactInfoType.Email,
+            Value = "old@example.com",
+            IsDefault = false
+        };
+        var updateContactInfoDto = new ContactInfoDto(contactInfoId, infoType, "new value", true);
+
+        _mockContactRepository.Setup(x => x.GetContactByIdAsync(contactId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(contact);
+        _mockContactInfoRepository.Setup(x => x.GetContactInfoAsync(contactInfoId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(contactInfo);
+        _mockUnitOfWork.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(1);
+
+        // Act
+        var result = await _controller.UpdateContactInfo(contactId, updateContactInfoDto, CancellationToken.None);
+
+        // Assert
+        result.Should().BeOfType<Microsoft.AspNetCore.Http.HttpResults.NoContent>();
+    }
+
+    [Fact]
+    public async Task UpdateContactInfo_ThrowsArgumentException_ForInvalidInfoType()
+    {
+        // Arrange
+        var contactId = Guid.NewGuid();
+        var contactInfoId = Guid.NewGuid();
+        var contact = new Contact { Id = contactId, FirstName = "John", LastName = "Doe" };
+        var contactInfo = new ContactInfo
+        {
+            Id = contactInfoId,
+            ContactId = contactId,
+            InfoType = ContactInfoType.Email,
+            Value = "old@example.com",
+            IsDefault = false
+        };
+        var updateContactInfoDto = new ContactInfoDto(contactInfoId, "InvalidType", "new value", true);
+
+        _mockContactRepository.Setup(x => x.GetContactByIdAsync(contactId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(contact);
+        _mockContactInfoRepository.Setup(x => x.GetContactInfoAsync(contactInfoId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(contactInfo);
+
+        // Act & Assert
+        await Assert.ThrowsAsync<ArgumentException>(() =>
+            _controller.UpdateContactInfo(contactId, updateContactInfoDto, CancellationToken.None));
+    }
+
+    [Fact]
+    public async Task CreateContact_WithoutContactInfo_ReturnsCreated()
+    {
+        // Arrange
+        var createContactDto = new CreateContactDto("John", "Doe", null);
+
+        _mockUnitOfWork.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(1);
+
+        // Act
+        var result = await _controller.CreateContact(createContactDto, CancellationToken.None);
+
+        // Assert
+        result.Should().BeOfType<Microsoft.AspNetCore.Http.HttpResults.Created>();
+        _mockContactRepository.Verify(x => x.CreateContactAsync(It.IsAny<Contact>(), It.IsAny<CancellationToken>()), Times.Once);
+        _mockContactInfoRepository.Verify(x => x.AddContactInfoAsync(It.IsAny<ContactInfo>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 }
