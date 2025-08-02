@@ -1,0 +1,151 @@
+services:
+  kafka-ui:
+      image: provectuslabs/kafka-ui:latest
+      container_name: kafka-ui
+      ports:
+        - "8080:8080"
+      depends_on:
+        kafka:
+          condition: service_healthy
+      environment:
+        KAFKA_CLUSTERS_0_NAME: local
+        KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:29092
+
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  contacts-api:
+    build:
+      context: .
+      dockerfile: src/ContactBook.Contacts.API/Dockerfile
+    ports:
+      - "5001:80"
+      - "5002:443"
+    environment:
+      - ConnectionStrings__contactsDb=Host=postgres;Database=ContactBook;Username=postgres;Password=postgres
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80;https://+:443
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/localhost.pfx
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=1
+    volumes:
+      - ~/.aspnet/https:/https:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  reports-api:
+    build:
+      context: .
+      dockerfile: src/ContactBook.Reports.API/Dockerfile
+    ports:
+      - "5003:80"
+      - "5004:443"
+    environment:
+      - ConnectionStrings__reportsDb=Host=postgres;Database=ContactBookReports;Username=postgres;Password=postgres
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80;https://+:443
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/localhost.pfx
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=1
+      - Kafka__BootstrapServers=kafka:29092
+    volumes:
+      - ~/.aspnet/https:/https:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+
+  reports-consumer:
+    build:
+      context: .
+      dockerfile: src/ContactBook.Reports.Consumer/Dockerfile
+    environment:
+      - DOTNET_ENVIRONMENT=Development
+      - ConnectionStrings__contactsDb=Host=postgres;Database=ContactBook;Username=postgres;Password=postgres
+      - ConnectionStrings__reportsDb=Host=postgres;Database=ContactBookReports;Username=postgres;Password=postgres
+      - Kafka__BootstrapServers=kafka:29092
+      - Kafka__ConsumerGroupId=contactbook-report-worker
+      - Kafka__ReportRequestTopic=report-requests
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    restart: on-failure
+
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    container_name: kafka
+    ports:
+      - "9092:9092"
+      - "9101:9101" # for JMX or monitoring (optional)
+    environment:
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_NODE_ID: 1
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:29093
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092,CONTROLLER://kafka:29093
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT,CONTROLLER:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_LOG_DIRS: /tmp/kraft-combined-logs
+      CLUSTER_ID: "local-kafka-cluster-id"
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "false"
+      KAFKA_OFFSET_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      # Corrected coordinator settings
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_OFFSETS_TOPIC_NUM_PARTITIONS: 50
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      # Force creation of consumer offsets topic
+      KAFKA_OFFSETS_TOPIC_SEGMENT_BYTES: 104857600
+      KAFKA_OFFSETS_RETENTION_MINUTES: 10080
+    healthcheck:
+      test: [ "CMD-SHELL", "kafka-topics --bootstrap-server kafka:29092 --list && kafka-consumer-groups --bootstrap-server kafka:29092 --list || exit 1" ]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+  
+  kafka-init:
+    image: bitnami/kafka:latest
+    depends_on:
+      kafka:
+        condition: service_healthy
+    entrypoint: sh
+    command:
+      - -c
+      - >
+        echo 'Waiting for Kafka to be fully ready...';
+        sleep 10;
+        echo 'Checking coordinator availability...';
+        until kafka-consumer-groups.sh --bootstrap-server kafka:29092 --list > /dev/null 2>&1; do
+          echo 'Coordinator not ready, waiting...';
+          sleep 3;
+        done;
+        echo 'Coordinator is ready!';
+        if ! kafka-topics.sh --bootstrap-server kafka:29092 --list | grep -q '^report-requests$'; then
+          echo 'Creating topic: report-requests';
+          kafka-topics.sh --create --if-not-exists --bootstrap-server kafka:29092 --replication-factor 1 --partitions 1 --topic report-requests;
+        else
+          echo 'Topic report-requests already exists.';
+        fi;
+        echo 'Ensuring __consumer_offsets topic exists...';
+        kafka-topics.sh --create --if-not-exists --bootstrap-server kafka:29092 --replication-factor 1 --partitions 50 --topic __consumer_offsets || echo 'Offsets topic already exists or will be auto-created';
+    
+    restart: "no"
+
+volumes:
+  postgres_data:

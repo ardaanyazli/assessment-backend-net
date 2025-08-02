@@ -1,90 +1,119 @@
-# Backend (.NET) Assessment
+# ContactBook Çözümü
 
-## Merhaba 
+.NET 9 ile geliştirilmiş, mikroservis mimarisi, olay odaklı iletişim ve kapsamlı raporlama özellikleri içeren kapsamlı bir iletişim yönetim sistemi.
 
-Bu değerlendirme işe başvuru sürecindeki adaylar için hazırlanmış olup, katılacak kimselerin yaklaşım ve yetkinliklerini değerlendirmede bizlere yardımcı olmak için tasarlanmıştır.
+## 🏗️ Mimari Genel Bakış
 
-Değerlendirme dahilinde; belirtilen süre içerisinde aşağıda kapsamı ve detayları belirlenmiş projeyi tamamlamanızı beklemekteyiz. Dikkat edebileceğiniz bir diğer husus ise, bizlerin doğru bir değerlendirme yapmamıza yardımcı olacak şekilde iletebileceğiniz en iyi çalışmayı bizlere teslim ediyor olmanız.
+Bu çözüm, Clean Architecture (Temiz Mimari) prensiplerini takip eder ve aşağıdaki bileşenlerle bir mikroservis yapısını uygular:
 
+### Temel Servisler
+- **ContactBook.Contacts.API** - Kişi yönetimi için RESTful API
+- **ContactBook.Reports.API** - Rapor oluşturma ve alma için RESTful API
+- **ContactBook.Reports.Consumer** - Rapor isteklerini işleyen arka plan servisi
 
-### Senaryo
+### Mimari Katmanlar
+- **Domain Katmanı** - İş varlıkları ve iş kuralları
+- **Application Katmanı** - Arayüzler, DTO’lar ve uygulama servisleri
+- **Infrastructure Katmanı** - Veri erişimi, dış servisler ve kalıcılık
+- **API Katmanı** - Controller’lar, middleware ve API yapılandırması
 
-Birbirleri ile haberleşen minimum iki microservice'in olduğu bir yapı tasarlayarak, basit bir telefon rehberi uygulaması oluşturulması sağlanacaktır.
+## 📁 Proje Yapısı
 
-Beklenen işlevler:
-- Rehberde kişi oluşturma
-- Rehberde kişi kaldırma
-- Rehberdeki kişiye iletişim bilgisi ekleme
-- Rehberdeki kişiden iletişim bilgisi kaldırma
-- Rehberdeki kişilerin listelenmesi
-- Rehberdeki bir kişiyle ilgili iletişim bilgilerinin de yer aldığı detay bilgilerin getirilmesi
-- Rehberdeki kişilerin bulundukları konuma göre istatistiklerini çıkartan bir rapor talebi
-- Sistemin oluşturduğu raporların listelenmesi
-- Sistemin oluşturduğu bir raporun detay bilgilerinin getirilmesi
+(proje klasör yapısı görseli korunmuştur)
 
+## 🚀 Özellikler
 
-### Teknik Tasarım
+### Kişi Yönetimi
+- ✅ Kişi oluşturma, okuma, güncelleme ve silme
+- ✅ İletişim bilgileri (e-posta, telefon, konum) yönetimi
+- ✅ Varsayılan iletişim bilgisi belirleme
+- ✅ Kapsamlı doğrulama ve hata yönetimi
+- ✅ Tüm işlemler için iptal destekli (CancellationToken)
 
-**Kişiler:**
-Sistemde teorik anlamda sınırsız sayıda kişi kaydı yapılabilecektir. Her kişiye bağlı iletişim bilgileri de yine sınırsız bir biçimde eklenebilmelidir.
+### Raporlama Sistemi
+- ✅ Asenkron rapor oluşturma
+- ✅ Konuma göre iletişim istatistikleri
+- ✅ Konuma göre telefon numarası dağılımı
+- ✅ Apache Kafka ile olay tabanlı mimari
+- ✅ Rapor durumu takibi (İstendi → İşleniyor → Tamamlandı)
 
-Karşılanması beklenen veri yapısındaki gerekli alanlar aşağıdaki gibidir:
+### Teknik Özellikler
+- ✅ Clean Architecture ve DDD prensipleri
+- ✅ Entity Framework Core & PostgreSQL
+- ✅ Apache Kafka mesajlaşma sistemi
+- ✅ Kapsamlı hata yönetimi ve loglama
+- ✅ İstek iptal desteği
+- ✅ Sağlık kontrolleri
+- ✅ OpenAPI/Swagger belgeleri
+- ✅ Docker ile konteynerleştirme
 
-- UUID
-- Ad
-- Soyad
-- Firma
-- İletişim Bilgisi
-  - Bilgi Tipi: Telefon Numarası, E-mail Adresi, Konum
-  - Bilgi İçeriği
+## 🛠️ Teknoloji Yığını
 
-**Rapor:**
-Rapor talepleri asenkron çalışacaktır. Kullanıcı bir rapor talep ettiğinde, sistem arkaplanda bu çalışmayı darboğaz yaratmadan sıralı bir biçimde ele alacak; rapor tamamlandığında ise kullanıcının "raporların listelendiği" endpoint üzerinden raporun durumunu "tamamlandı" olarak gözlemleyebilmesi gerekmektedir.
+- **Framework**: .NET 9
+- **Veritabanı**: PostgreSQL
+- **Mesaj Aracısı**: Apache Kafka
+- **ORM**: Entity Framework Core
+- **API Belgeleme**: OpenAPI/Swagger
+- **Test**: xUnit, Moq, FluentAssertions
+- **Konteyner**: Docker & Docker Compose
 
-Rapor basitçe aşağıdaki bilgileri içerecektir:
+## 📋 Gereksinimler
 
-- Konum Bilgisi
-- O konumda yer alan rehbere kayıtlı kişi sayısı
-- O konumda yer alan rehbere kayıtlı telefon numarası sayısı
+- .NET 9 SDK
+- Docker ve Docker Compose
+- PostgreSQL (ya da Docker ile)
+- Apache Kafka (ya da Docker ile)
 
-Veri yapısı olarak da:
+## 🏃‍♂️ Başlangıç Adımları
 
-- UUID
-- Raporun Talep Edildiği Tarih
-- Rapor Durumu (Hazırlanıyor, Tamamlandı)
+1. Repoyu klonlayın  
+2. Altyapı servislerini Docker Compose ile başlatın  
+3. `appsettings.Development.json` dosyalarında bağlantı bilgilerini güncelleyin  
+4. Veritabanı göçlerini (migrations) uygulayın  
+5. Servisleri başlatın (Docker veya manuel)  
+6. API’lara şu adreslerden erişin:
+   - **Contacts API**: http://localhost:5115
+   - **Swagger**: http://localhost:5115/swagger
+   - **Reports API**: http://localhost:5263
+   - **Swagger**: http://localhost:5263/swagger
 
+## 📖 API Kullanım Örnekleri
 
-**NOT:** Değerlendirme ile ilgili beklentiler için *Teknik Beklentiler* bölümünü dikkatli okuyunuz.
+- Kişi oluştur, oku, güncelle, sil
+- Rapor isteği gönder
+- Tüm raporları veya belirli bir raporu getir
 
+## 🧪 Testleri Çalıştırma
 
-### Teknik Beklentiler
+- Tüm testleri çalıştır: `dotnet test`
+- Kapsama raporu üret: `dotnet test --collect:"XPlat Code Coverage"`
+- Belirli bir test projesini çalıştır
+- Kapsama raporu görselleştirme: `reportgenerator`
 
-- Kullanılacak Teknolojiler:
-  - .NET Core
-  - Git
-  - Postgres veya MongoDB
-  - Kafka v.b. Message Queue sistemi
+## 🏗️ Geliştirme Süreci
 
-- Kısıtlamalar ve Gereksinimler:
-  - Projenin sık commitlerle Git üzerinde geliştirilmesi
-  - Git üzerinde master, development branchleri ve sürüm taglemelerinin kullanımı
-  - Minimum %60 unit testing code coverage
-  - Projenin veritabanını oluşturacak migration yapısının oluşturulmuş olması
-  - Projenin nasıl çalıştırılacağına dair README.md dokümantasyonu
-  - Servislerin HTTP üzerinden REST veya GraphQL protokolleri üzerinden iletişimi sağlanmalı
-  - Rapor kısmındaki asenkron yapının sağlanması için message queue gibi sistemler kullanılmalıdır
+Yeni iletişim türü veya rapor tipi eklemek için:
+- Domain ve Application katmanlarını güncelle
+- EF Migration oluştur ve uygula
+- Gerekirse Controller’ı düzenle
 
+## 🔧 Yapılandırma
 
-### Çalışmanın Tamamlanması
+Servisler çevresel değişkenlerle yapılandırılabilir:
+- PostgreSQL bağlantı bilgileri
+- Kafka sunucu adresi
+- Ortam seçimi (Development/Production)
 
-Çalışma tamamlandığında bu codebase'i kişisel git repository'sine aktarmanız, çalışma bitiminde de bu repository adresiyle paylaşmanız beklenecektir.
+## 🔍 İzleme & Sağlık Kontrolleri
 
+- `/health` endpoint’leri
+- Yapılandırılmış loglama
+- Performans metrikleri
+- Kafka mesaj işleme günlükleri
 
-## Sorularınız
+## 🚨 Hata Yönetimi
 
-Değerlendirmelerle ilgili sorularınızı [github@setur.com.tr](mailto:github@setur.com.tr) adresine iletebilirsiniz.
-
-
-### Lisans
-
-[Apache 2.0](LICENSE) ile lisanslanmıştır.
+- Global hata middleware’i (`ErrorHandlingMiddleware`)
+- İstek iptali middleware’i
+- Doğrulama & iş kuralları kontrolü
+- Uygun HTTP durum kodları
