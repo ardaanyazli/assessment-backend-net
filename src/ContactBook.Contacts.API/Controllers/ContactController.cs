@@ -216,20 +216,21 @@ public class ContactsController : ControllerBase
 
         cancellationToken.ThrowIfCancellationRequested();
 
-        var updatedContactInfo = new ContactInfo
+        contactInfo.InfoType = updateContactInfoDto.Type switch
         {
-            Id = updateContactInfoDto.Id,
-            InfoType = Enum.Parse<ContactInfoType>(updateContactInfoDto.Type),
-            Value = updateContactInfoDto.Value,
-            IsDefault = updateContactInfoDto.IsDefault,
-            ContactId = id
+            "Location" => ContactInfoType.Location,
+            "Phone" => ContactInfoType.Phone,
+            "Email" => ContactInfoType.Email,
+            _ => throw new ArgumentException("Invalid contact info type", nameof(updateContactInfoDto.Type))
         };
+        contactInfo.Value = updateContactInfoDto.Value;
+        contactInfo.IsDefault = updateContactInfoDto.IsDefault;
 
-        _unitOfWork.ContactInfoRepository.UpdateContactInfo(updatedContactInfo);
+        _unitOfWork.ContactInfoRepository.UpdateContactInfo(contactInfo);
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-        return Results.Ok();
+        return Results.NoContent();
 
     }
 
