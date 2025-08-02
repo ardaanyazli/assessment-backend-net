@@ -1,6 +1,3 @@
-using System.ComponentModel;
-using System.Dynamic;
-using System.Reflection.Metadata.Ecma335;
 using ContactBook.Reports.Application.Interfaces;
 using ContactBook.Reports.Domain.Entities;
 using ContactBook.Reports.Infrastructure.Persistence;
