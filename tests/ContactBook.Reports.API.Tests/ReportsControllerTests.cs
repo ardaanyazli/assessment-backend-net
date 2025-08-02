@@ -3,6 +3,8 @@ using ContactBook.Reports.Application.DTOs;
 using ContactBook.Reports.Application.Interfaces;
 using ContactBook.Reports.Domain.Entities;
 using FluentAssertions;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 
@@ -139,7 +141,7 @@ public class ReportsControllerTests
         var result = await _controller.RequestReport(CancellationToken.None);
 
         // Assert
-        var acceptedResult = result.Should().BeOfType<AcceptedResult>().Subject;
+        var acceptedResult = result.Should().BeOfType<OkObjectResult>().Subject;
         acceptedResult.Value.Should().Be("Report reequested sucessfully");
         
         _mockReportRepository.Verify(x => x.CreateReportAsync(It.IsAny<Report>(), It.IsAny<CancellationToken>()), Times.Once);

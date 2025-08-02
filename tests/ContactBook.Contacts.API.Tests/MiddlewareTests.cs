@@ -37,7 +37,7 @@ public class ErrorHandlingMiddlewareTests
         context.Response.Body.Seek(0, SeekOrigin.Begin);
         var reader = new StreamReader(context.Response.Body);
         var responseBody = await reader.ReadToEndAsync();
-        
+
         var errorResponse = JsonSerializer.Deserialize<JsonElement>(responseBody);
         errorResponse.GetProperty("status").GetInt32().Should().Be(500);
         errorResponse.GetProperty("message").GetString().Should().Be("An internal server error occurred. Please try again later.");
@@ -50,7 +50,7 @@ public class ErrorHandlingMiddlewareTests
         var middleware = new ErrorHandlingMiddleware(
             context => throw new OperationCanceledException(),
             _mockLogger.Object);
-        
+
         var context = new DefaultHttpContext();
 
         // Act & Assert
@@ -64,19 +64,29 @@ public class ErrorHandlingMiddlewareTests
         var middleware = new ErrorHandlingMiddleware(
             async context =>
             {
-                await context.Response.WriteAsync("Response started");
+                await Task.Delay(100); // Simulate some processing
                 throw new Exception("Test exception");
             },
             _mockLogger.Object);
-        
-        var context = new DefaultHttpContext();
-        context.Response.Body = new MemoryStream();
+
+        var mockResponse = new Mock<HttpResponse>();
+        mockResponse.Setup(r => r.HasStarted).Returns(true);
+        mockResponse.SetupProperty(r => r.StatusCode, StatusCodes.Status200OK);
+        mockResponse.SetupGet(r => r.Body).Returns(new MemoryStream());
+
+        var mockContext = new Mock<HttpContext>();
+        mockContext.SetupGet(c => c.Response).Returns(mockResponse.Object);
+        mockContext.SetupGet(c => c.Request.Path).Returns("/failtest");
 
         // Act
-        await middleware.InvokeAsync(context);
+        Func<Task> act = () => middleware.InvokeAsync(mockContext.Object);
+
+        act.Should().ThrowAsync<Exception>()
+            .WithMessage("Test exception");
+
 
         // Assert
-        context.Response.StatusCode.Should().Be(200); // Default status, not changed to 500
+        mockContext.Object.Response.StatusCode.Should().Be(StatusCodes.Status200OK); // Default status, not changed to 500
     }
 }
 
@@ -109,7 +119,7 @@ public class RequestCancellationMiddlewareTests
 
         // Assert
         context.Response.StatusCode.Should().Be(499);
-        
+
         context.Response.Body.Seek(0, SeekOrigin.Begin);
         var reader = new StreamReader(context.Response.Body);
         var responseBody = await reader.ReadToEndAsync();
@@ -123,23 +133,29 @@ public class RequestCancellationMiddlewareTests
         var cancellationTokenSource = new CancellationTokenSource();
         cancellationTokenSource.Cancel();
 
+
         var middleware = new RequestCancellationMiddleware(
-            async context =>
+            async ctx =>
             {
-                await context.Response.WriteAsync("Response started");
                 throw new OperationCanceledException(cancellationTokenSource.Token);
             },
             _mockLogger.Object);
 
-        var context = new DefaultHttpContext();
-        context.RequestAborted = cancellationTokenSource.Token;
-        context.Response.Body = new MemoryStream();
+        var mockResponse = new Mock<HttpResponse>();
+        mockResponse.Setup(r => r.HasStarted).Returns(true);
+        mockResponse.SetupProperty(r => r.StatusCode, StatusCodes.Status200OK);
+        mockResponse.SetupGet(r => r.Body).Returns(new MemoryStream());
+
+        var mockContext = new Mock<HttpContext>();
+        mockContext.SetupGet(c => c.RequestAborted).Returns(cancellationTokenSource.Token);
+        mockContext.SetupGet(c => c.Response).Returns(mockResponse.Object);
 
         // Act
-        await middleware.InvokeAsync(context);
+        Func<Task> act = () => middleware.InvokeAsync(mockContext.Object);
 
+        act.Should().ThrowAsync<OperationCanceledException>();
         // Assert
-        context.Response.StatusCode.Should().Be(200); // Default status, not changed to 499
+        mockContext.Object.Response.StatusCode.Should().Be(StatusCodes.Status200OK); // Default status, not changed to 499
     }
 
     [Fact]

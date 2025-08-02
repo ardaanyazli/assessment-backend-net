@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.VisualStudio.TestPlatform.TestHost;
 using System.Net.Http.Json;
 using System.Text.Json;
 
@@ -50,7 +49,7 @@ public class ContactsApiIntegrationTests : IClassFixture<WebApplicationFactory<P
         var response = await _client.GetAsync("/Contacts");
 
         // Assert
-        response.Should().BeSuccessful();
+         response.Should().Be(System.Net.HttpStatusCode.OK);
         var content = await response.Content.ReadAsStringAsync();
         var contacts = JsonSerializer.Deserialize<List<ContactListDto>>(content, new JsonSerializerOptions
         {
@@ -89,7 +88,7 @@ public class ContactsApiIntegrationTests : IClassFixture<WebApplicationFactory<P
         var response = await _client.GetAsync("/Contacts");
 
         // Assert
-        response.Should().BeSuccessful();
+         response.Should().Be(System.Net.HttpStatusCode.OK);
         var content = await response.Content.ReadAsStringAsync();
         var contacts = JsonSerializer.Deserialize<List<ContactListDto>>(content, new JsonSerializerOptions
         {
@@ -120,7 +119,7 @@ public class ContactsApiIntegrationTests : IClassFixture<WebApplicationFactory<P
         var response = await _client.GetAsync($"/Contacts/{contact.Id}");
 
         // Assert
-        response.Should().BeSuccessful();
+         response.Should().Be(System.Net.HttpStatusCode.OK);
         var content = await response.Content.ReadAsStringAsync();
         var contactDto = JsonSerializer.Deserialize<ContactDto>(content, new JsonSerializerOptions
         {
@@ -166,7 +165,7 @@ public class ContactsApiIntegrationTests : IClassFixture<WebApplicationFactory<P
         var response = await _client.PutAsJsonAsync($"/Contacts/{contact.Id}", updateDto);
 
         // Assert
-        response.Should().BeSuccessful();
+        response.Should().Be(System.Net.HttpStatusCode.OK);
         
         // Verify the update
         var updatedContact = await context.Contacts.FindAsync(contact.Id);
@@ -239,7 +238,7 @@ public class ContactsApiIntegrationTests : IClassFixture<WebApplicationFactory<P
         var response = await _client.GetAsync("/health");
 
         // Assert
-        response.Should().BeSuccessful();
+        response.Should().Be(System.Net.HttpStatusCode.OK);
         var content = await response.Content.ReadAsStringAsync();
         content.Should().Be("Healthy");
     }

@@ -71,6 +71,6 @@ public class ReportsController : ControllerBase
         await _reportRepository.CreateReportAsync(report, cancellationToken);
         await _kafkaProducer.PublishAsync("report-requests", report.Id, cancellationToken);
 
-        return Accepted("Report reequested sucessfully");
+        return Ok("Report reequested sucessfully");
     }
 }

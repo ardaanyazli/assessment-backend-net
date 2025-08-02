@@ -55,3 +55,4 @@ if (app.Environment.IsDevelopment())
 
 app.Run();
 
+public partial class Program { } // This is required for the integration tests to work correctly

@@ -5,6 +5,9 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
+    <UseAppHost>true</UseAppHost>
+    <PreserveCompilationContext>true</PreserveCompilationContext>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
 
   <ItemGroup>
@@ -15,9 +18,11 @@
     <PackageReference Include="Moq" Version="4.20.72" />
     <PackageReference Include="xunit" Version="2.9.3" />
     <PackageReference Include="xunit.runner.visualstudio" Version="3.1.3" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.7" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="9.0.7" />
   </ItemGroup>
 
- <ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\..\src\ContactBook.Contacts.API\ContactBook.Contacts.API.csproj" />
     <ProjectReference Include="..\..\src\ContactBook.Reports.API\ContactBook.Reports.API.csproj" />
   </ItemGroup>
