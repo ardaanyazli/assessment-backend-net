@@ -7,7 +7,7 @@ namespace  ContactBook.Reports.Infrastructure.MesssageBroker;
 
 public class KafkaProducer : IKafkaProducer
 {
-    private readonly IProducer<Null, string> _producer;
+    private readonly IProducer<string, string> _producer;
 
     public KafkaProducer(IConfiguration configuration)
     {
@@ -16,12 +16,12 @@ public class KafkaProducer : IKafkaProducer
             BootstrapServers = configuration["Kafka:BootstrapServers"]
         };
         
-        _producer = new ProducerBuilder<Null, string>(config).Build();
+        _producer = new ProducerBuilder<string, string>(config).Build();
     }
 
     public async Task PublishAsync<T>(string topic, T message, CancellationToken cancellationToken)
     {
         var json = JsonSerializer.Serialize(message);
-        await _producer.ProduceAsync(topic, new Message<Null, string> { Value = json }, cancellationToken);
+        await _producer.ProduceAsync(topic, new Message<string, string> { Key= "report requested",Value = json }, cancellationToken);
     }
 }

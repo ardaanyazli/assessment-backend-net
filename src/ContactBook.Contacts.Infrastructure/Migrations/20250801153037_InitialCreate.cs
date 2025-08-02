@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -45,7 +46,7 @@ namespace ContactBook.Contacts.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_ContactInfos_ContactId",
+                name: "IX_ContactInfo_ContactId",
                 table: "ContactInfos",
                 column: "ContactId");
         }

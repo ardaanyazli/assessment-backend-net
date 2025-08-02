@@ -47,7 +47,7 @@ public class ReportsController : ControllerBase
         var result = new ReportDto
         (
             report.Id,
-            report.Data.Select(rd => new LocationStatisticsDto
+            report.Data?.Select(rd => new LocationStatisticsDto
             (
                 rd.Location,
                 rd.ContactCount,

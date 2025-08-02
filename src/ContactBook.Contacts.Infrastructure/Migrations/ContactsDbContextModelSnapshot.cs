@@ -62,7 +62,8 @@ namespace ContactBook.Contacts.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ContactId");
+                    b.HasIndex("ContactId")
+                        .HasDatabaseName("IX_ContactInfo_ContactId");
 
                     b.ToTable("ContactInfos");
                 });

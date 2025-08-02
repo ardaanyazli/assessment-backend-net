@@ -1,5 +1,6 @@
 using ContactBook.Reports.API.Middleware;
 using ContactBook.Reports.Application.Interfaces;
+using ContactBook.Reports.Infrastructure.MesssageBroker;
 using ContactBook.Reports.Infrastructure.Persistence;
 using ContactBook.Reports.Infrastructure.Repository;
 using Microsoft.EntityFrameworkCore;
@@ -16,6 +17,7 @@ builder.Services.AddDbContext<ReportDbContext>(options =>{
     options.UseNpgsql(builder.Configuration.GetConnectionString("reportsDb"));
     });
     builder.Services.AddScoped<IReportRepository,ReportRepository>();
+    builder.Services.AddSingleton<IKafkaProducer, KafkaProducer>();
 
 var app = builder.Build();
 // Configure the HTTP request pipeline.

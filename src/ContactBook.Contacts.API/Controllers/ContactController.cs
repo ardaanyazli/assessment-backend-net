@@ -22,7 +22,6 @@ public class ContactsController : ControllerBase
     }
 
     [HttpGet]
-
     public async Task<IResult> GetContacts(CancellationToken cancellationToken)
     {
         try
@@ -49,7 +48,6 @@ public class ContactsController : ControllerBase
     }
 
     [HttpGet("{id}")]
-
     public async Task<IResult> GetContactById(Guid id, CancellationToken cancellationToken)
     {
         try
@@ -89,16 +87,19 @@ public class ContactsController : ControllerBase
 
             await _unitOfWork.ContactRepository.CreateContactAsync(contact, cancellationToken);
 
-            foreach (var contactInfo in createContactDto.ContactInfo)
+            if (createContactDto.ContactInfo != null && createContactDto.ContactInfo.Any())
             {
-                await _unitOfWork.ContactInfoRepository.AddContactInfoAsync(new ContactInfo
+                foreach (var contactInfo in createContactDto.ContactInfo)
                 {
-                    Id = Guid.NewGuid(),
-                    InfoType = contactInfo.ContactInfoType,
-                    Value = contactInfo.Value,
-                    IsDefault = contactInfo.IsDefault,
-                    ContactId = contact.Id
-                }, cancellationToken);
+                    await _unitOfWork.ContactInfoRepository.AddContactInfoAsync(new ContactInfo
+                    {
+                        Id = Guid.NewGuid(),
+                        InfoType = contactInfo.ContactInfoType,
+                        Value = contactInfo.Value,
+                        IsDefault = contactInfo.IsDefault,
+                        ContactId = contact.Id
+                    }, cancellationToken);
+                }
             }
 
             await _unitOfWork.SaveChangesAsync(cancellationToken);
@@ -112,7 +113,6 @@ public class ContactsController : ControllerBase
     }
 
     [HttpPut("{id}")]
-
     public async Task<IResult> UpdateContact(Guid id, UpdateContactDto updateContactDto, CancellationToken cancellationToken)
     {
 
@@ -133,7 +133,6 @@ public class ContactsController : ControllerBase
     }
 
     [HttpDelete("{id}")]
-
     public async Task<IResult> DeleteContact(Guid id, CancellationToken cancellationToken)
     {
 
@@ -172,7 +171,6 @@ public class ContactsController : ControllerBase
     }
 
     [HttpPost("{id}/info")]
-
     public async Task<IResult> AddContactInfo(Guid id, CreateContactInfoDto createContactInfoDto, CancellationToken cancellationToken)
     {
 
@@ -199,7 +197,6 @@ public class ContactsController : ControllerBase
     }
 
     [HttpPut("{id}/info")]
-
     public async Task<IResult> UpdateContactInfo(Guid id, ContactInfoDto updateContactInfoDto, CancellationToken cancellationToken)
     {
 

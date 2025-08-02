@@ -5,20 +5,16 @@ using ContactBook.Contacts.Infrastructure.Repository;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
-
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+
 builder.Services.AddDbContext<ContactsDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("contactsDb")));
 builder.Services.AddScoped<IContactsUnitOfWork, ContactsUnitOfWork>();
-
-builder.Services.AddControllers();
 builder.Services.AddHealthChecks();
+builder.Services.AddControllers();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 app.Use(async (context, next) =>
 {
     var cancellationToken = context.RequestAborted;

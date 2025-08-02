@@ -1,8 +1,6 @@
 using ContactBook.Contacts.Domain.Entities;
 
-namespace ContactBook.Contacts.Application.DTOs;
-
-public record CreateContactInfoDto(
+public record UpdateContactInfoDto(
     ContactInfoType ContactInfoType,
     string Value,
     bool IsDefault

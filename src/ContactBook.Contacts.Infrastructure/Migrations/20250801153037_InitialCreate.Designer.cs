@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ContactBook.Contacts.Infrastructure.Migrations
 {
     [DbContext(typeof(ContactsDbContext))]
-    [Migration("20250801062557_InitialCreate")]
+    [Migration("20250801153037_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -65,7 +65,8 @@ namespace ContactBook.Contacts.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ContactId");
+                    b.HasIndex("ContactId")
+                        .HasDatabaseName("IX_ContactInfo_ContactId");
 
                     b.ToTable("ContactInfos");
                 });

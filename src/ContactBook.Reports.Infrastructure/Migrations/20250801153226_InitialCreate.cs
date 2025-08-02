@@ -1,4 +1,4 @@
-﻿using ContactBook.Reports.Domain.Entities;
+﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -18,7 +18,7 @@ namespace ContactBook.Reports.Infrastructure.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     RequestedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     Status = table.Column<int>(type: "integer", nullable: false),
-                    Data = table.Column<IList<LocationStatistics>>(type: "jsonb", nullable: false)
+                    Data = table.Column<string>(type: "jsonb", nullable: true)
                 },
                 constraints: table =>
                 {
